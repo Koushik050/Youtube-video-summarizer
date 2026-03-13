@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Summarizer</title>
+    <style>
+        /* Full-page background */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('https://sdmntprsouthcentralus.oaiusercontent.com/files/00000000-9e8c-51f7-9be2-d3247ee6c600/raw?se=2025-04-06T14%3A01%3A54Z&sp=r&sv=2024-08-04&sr=b&scid=e49531aa-f4de-5bfa-8de9-f0314850faba&skoid=7c382de0-129f-486b-9922-6e4a89c6eb7d&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-04-06T12%3A33%3A29Z&ske=2025-04-07T12%3A33%3A29Z&sks=b&skv=2024-08-04&sig=10huFIli5FAOnsN5%2Bz/Wuyrt%2BdYGrReocFZ2h3kgh9A%3D');  /* Change this to your background image */
+            background-size: cover;
+            
+            margin: 0;
+            color: white;  /* Set default font color to white */
+        }
+
+        /* Main container */
+        .container {
+            background-color: rgba(0, 0, 0, 0.85); /* Black with slight transparency */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
+            text-align: center;
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* White text */
+        h2 {
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        /* Input fields, dropdowns, and buttons */
+        input, select, button {
+            width: calc(100% - 20px);  /* Consistent width for all inputs */
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #222;  /* Dark input fields */
+            color: white;  /* White text inside inputs */
+            display: block;
+        }
+
+        /* Button Styling */
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        /* Output Box */
+        .output-box {
+            background-color: black; /* Black background */
+            color: white; /* White text */
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: left;
+            width: calc(100% - 20px);
+            min-height: 100px;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.3);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>YouTube Video Summarizer</h2>
+
+        <input type="text" id="youtube_link" placeholder="Enter YouTube Link">
+        <input type="number" id="num_bullets" placeholder="Number of bullet points" min="1" max="10">
+        <select id="language">
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+            <option value="te">Telugu</option>
+            <option value="ta">Tamil</option>
+        </select>
+        <button onclick="summarize()">Summarize</button>
+
+        <!-- Output Box -->
+        <div id="summary" class="output-box">Your summary will appear here...</div>
+    </div>
+
+    <script>
+        function summarize() {
+            const youtubeLink = document.getElementById("youtube_link").value;
+            const numBullets = document.getElementById("num_bullets").value;
+            const language = document.getElementById("language").value;
+
+            if (!youtubeLink) {
+                alert("Please enter a valid YouTube link.");
+                return;
+            }
+
+            document.getElementById("summary").innerHTML = "⏳ Generating summary...";
+
+            fetch("http://127.0.0.1:5000/summarize", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ youtube_link: youtubeLink, num_bullets: numBullets, language: language })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("summary").innerHTML = `<p>✅ Summary:</p><p>${data.summary.replace(/\n/g, "<br>")}</p>`;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("summary").innerHTML = "❌ Failed to generate summary.";
+            });
+        }
+    </script>
+
+</body>
+</html>
